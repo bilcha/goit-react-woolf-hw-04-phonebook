@@ -4,27 +4,29 @@ import { ContactList } from './ContactList/ContactList';
 import { Filter } from './Filter/Filter';
 
 const App = () => {
-  const [contacts, setContacts] = useState([]);
-  const [filter, setFilter] = useState('');
-  const [filteredContacts, setFilteredContacts] = useState([]);
-
-  useEffect(() => {
+  const getSavedData = () => {
+    let data = [];
     const localStorageData = localStorage.getItem('contacts');
     if (localStorageData && JSON.parse(localStorageData).length > 0) {
-      setContacts(JSON.parse(localStorageData));
+      data = JSON.parse(localStorageData);
     }
-  }, []);
+    return data;
+  };
 
+  const [contacts, setContacts] = useState(() => {
+    return getSavedData();
+  });
+
+  const [filter, setFilter] = useState('');
   useEffect(() => {
     localStorage.setItem('contacts', JSON.stringify(contacts));
   }, [contacts]);
 
-  useEffect(() => {
-    const filtered = contacts.filter(el => {
+  const getFilteredItems = () => {
+    return contacts.filter(el => {
       return el.name.toLowerCase().includes(filter);
     });
-    setFilteredContacts(filtered);
-  }, [filter, contacts]);
+  };
 
   function addContact(newData) {
     if (
@@ -58,7 +60,7 @@ const App = () => {
       <h2>Contacts</h2>
       <Filter addFilter={addFilter} />
       <ContactList
-        contactList={filteredContacts}
+        contactList={getFilteredItems()}
         deleteContact={deleteContact}
       />
     </div>
